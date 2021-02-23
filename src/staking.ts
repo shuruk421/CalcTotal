@@ -1,4 +1,4 @@
-import { lockedSupplyAddresses, stakingContractABI, providerAddress, benefitAddress, benefitContractABI } from './constants';
+import { lockedSupplyAddresses, stakingContractABI, providerAddress, benefitContractABI } from './constants';
 
 const Web3 = require('web3')
 
