@@ -74,7 +74,9 @@ export async function CleanBalances(balances: any) {
   let promises = [];
   for (let key in balances) {
     let value = balances[key];
-    if (value == 0) // clean 0s
+    if(key == '0x0000000000000000000000000000000000000000')
+      delete balances[key];
+    else if (value == 0) // clean 0s
       delete balances[key];
     else
       promises.push(web3.eth.getCode(key).then(code => {

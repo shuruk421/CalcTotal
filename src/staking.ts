@@ -3,20 +3,10 @@ import { lockedSupplyAddresses, stakingContractABI, providerAddress, benefitCont
 const Web3 = require('web3')
 
 let web3 = new Web3(providerAddress);
-export async function getStakingTransactions(address:any, from:any, to:any) {
+export async function getStakingAddresses(address:any, from:any, to:any) {
     let promises = []; // promises for locked supply addresses
     let stakingContract = new web3.eth.Contract(stakingContractABI, address);
     promises.push(stakingContract.getPastEvents("Staked", //promise for staked
-        {
-            fromBlock: from,
-            toBlock: to
-        })); //make event promise;
-    promises.push(stakingContract.getPastEvents("PaidOut", //promises for paidout
-        {
-            fromBlock: from,
-            toBlock: to
-        })); //make event promise;
-    promises.push(stakingContract.getPastEvents("Refunded", //promises for refunded
         {
             fromBlock: from,
             toBlock: to
@@ -52,7 +42,7 @@ export async function SumStakingAddresses(balances:any, addresses:any) {
 
 export async function GetStaking(balances:any) {
     for (let i = 0; i < lockedSupplyAddresses.length; i++) {
-        let txs = await getStakingTransactions(lockedSupplyAddresses[i], 1, 'latest')
+        let txs = await getStakingAddresses(lockedSupplyAddresses[i], 1, 'latest')
         balances = await SumStakingAddresses(balances, txs);
     }
     return balances;
