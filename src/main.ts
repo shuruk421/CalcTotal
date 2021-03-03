@@ -41,59 +41,84 @@ export async function RandomizeWinnings(balances: any, tiers: any, totalWin: num
   return result;
 }
 
+export async function SumWinnings(winnings: any) {
+  let total = 0;
+  winnings.forEach((winning: any) => {
+    total += winning.winAmount;
+  });
+  return total;
+}
+
 export async function toCSV(data: any, tiers: any) {
   let csv = '"Address","Total",';
   tiers.forEach((tier: any) => {
-    csv += '"' + tier.name + '",'
+    csv += '"' + tier.name + '",';
   })
-  data.forEach((addr: any) => {
-    csv += '\n"' + addr.addr + '",' + '"' + addr.total + '",';
+  csv += '"Total Winnings",';
+  for (let i = 0; i < data.length; i++) {
+    csv += '\n"' + data[i].addr + '",' + '"' + data[i].total + '",';
     tiers.forEach((tier: any, index: any) => {
-      csv += '"' + addr.winnings[index].winAmount + '",';
+      csv += '"' + data[i].winnings[index].winAmount + '",';
     })
-  });
+    await SumWinnings(data[i].winnings).then(total => {
+      csv += '"' + total + '",';
+    });
+  };
   return csv;
 }
 
 export async function calcTotal(getLP: any, getStaking: any, getWallet: any) {
   var balances: { [address: string]: number; } = {};
-  if (getLP)
+
+  if (getLP) {
     balances = await LP.GetLP(balances);
+  }
 
-  if (getStaking)
+  if (getStaking) {
     balances = await Staking.GetStaking(balances);
+  }
 
-  if (getWallet)
+  if (getWallet) {
     balances = await Wallet.GetWallet(balances, tokenStartBlock); // token first block
-
+  }
   balances = await CleanBalances(balances);
   return balances;
 }
 
-export async function CleanBalances(balances: any) {
-  let promises = [];
-  for (let key in balances) {
-    let value = balances[key];
-    if(key == '0x0000000000000000000000000000000000000000')
-      delete balances[key];
-    else if (value == 0) // clean 0s
-      delete balances[key];
-    else
-      promises.push(web3.eth.getCode(key).then(code => {
-        if (code != '0x') // if contract
-          delete balances[key];
-      }));
-  }
-  await Promise.all(promises);
-  var items = Object.keys(balances).map(function (key) {
-    return [key, balances[key]];
+export async function SortDictionary(dictionary:any) {
+  var items = Object.keys(dictionary).map(function (key) {
+    return [key, dictionary[key]];
   });
   items.sort(function (first, second) {
     return second[1] - first[1];
   });//sort
-  balances = {};
+  dictionary = {};
   items.forEach(item => {//copy to dictionary
-    balances[item[0]] = item[1];
+    dictionary[item[0]] = item[1];
   });
+  return dictionary;
+}
+
+export async function RemoveZeros(dictionary:any) {
+  let promises = [];
+  for (let key in dictionary) {
+    let value = dictionary[key];
+    if (key == '0x0000000000000000000000000000000000000000') // remove zero address (not contract)
+      delete dictionary[key];
+    else if (value == 0) // clean 0s
+      delete dictionary[key];
+    else
+      promises.push(web3.eth.getCode(key).then(code => {
+        if (code != '0x') // if contract
+          delete dictionary[key];
+      }));
+  }
+  await Promise.all(promises);
+  return dictionary;
+}
+
+export async function CleanBalances(balances: any) {
+  balances = await RemoveZeros(balances);
+  balances = await SortDictionary(balances);
   return balances;
 }

@@ -5,25 +5,39 @@ import * as Main from './main.ts'
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import { CSVLink, CSVDownload } from 'react-csv';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Button from '@material-ui/core/Button';
+import ProgressBar from 'react-bootstrap/ProgressBar'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+export var now = 0;
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.csvLink = React.createRef();
   }
+  
   state = {
     getLP: false,
     getStaking: false,
     getWallet: false,
+    id: 0,
     totalWin: 0,
     allocation: 0,
     minPoolz: 0,
     numOfWinners: 0,
     name: '',
     tiers: [],
-    csvdata: ''
+    csvdata: '',
+    //progress: 0
   };
-
+  
   render() {
     return (
       <div className="App">
@@ -48,7 +62,7 @@ class App extends Component {
           name="getWalletCheckBox"
           color="primary"
         />
-        <button onClick={() => {
+        <Button variant="contained" onClick={() => {
           Main.calcTotal(this.state.getLP, this.state.getStaking, this.state.getWallet).then(balances => {
             Main.RandomizeWinnings(balances, this.state.tiers, this.state.totalWin).then(result => {
               Main.toCSV(result, this.state.tiers).then(csv => {
@@ -59,59 +73,89 @@ class App extends Component {
           })
         }
         }>
-          Calc Total
-      </button>
+          Calculate Total
+      </Button>
         <br />
         <TextField
           id="totalWin"
-          label="totalWin"
+          label="Total Win"
           value={this.state.totalWin}
           onChange={(event) => this.setState({ totalWin: event.target.value })}
         />
         &nbsp;
         <TextField
           id="name"
-          label="name"
+          label="Name"
           value={this.state.name}
           onChange={(event) => this.setState({ name: event.target.value })}
         />
         &nbsp;
         <TextField
           id="allocation"
-          label="allocation"
+          label="Allocation"
           value={this.state.allocation}
           onChange={(event) => this.setState({ allocation: event.target.value })}
         />
         &nbsp;
         <TextField
           id="minPoolz"
-          label="minPoolz"
+          label="Minimum POOLZ"
           value={this.state.minPoolz}
           onChange={(event) => this.setState({ minPoolz: event.target.value })}
         />
         &nbsp;
         <TextField
           id="numOfWinners"
-          label="numOfWinners"
+          label="Number Of Winners"
           value={this.state.numOfWinners}
           onChange={(event) => this.setState({ numOfWinners: event.target.value })}
         />
-        <button onClick={() => {
+        <Button variant="contained" onClick={() => {
           let newTiers = [...this.state.tiers];
-          newTiers.push({ allocation: this.state.allocation, minPoolz: this.state.minPoolz, numOfWinners: this.state.numOfWinners, name: this.state.name });
-          //{tiers: this.state.tiers.push({ allocation: this.state.allocation, minPoolz: this.state.minPoolz, numOfWinners: this.state.numOfWinners }) });
-          this.setState({ tiers: newTiers });
+          newTiers.push({
+            allocation: this.state.allocation,
+            minPoolz: this.state.minPoolz,
+            numOfWinners: this.state.numOfWinners,
+            name: this.state.name,
+            id: this.state.id
+          });
+          let newId = this.state.id + 1;
+          this.setState({ tiers: newTiers, id: newId });
         }
         }>
           Add Tier
-        </button>
-        <table>
-          <tbody>
-            <tr><th>name</th><th>allocation</th><th>minPoolz</th><th>numOfWinners</th></tr>
-            {this.state.tiers.map(value => (<tr><td>{value.name}</td><td>{value.allocation}</td><td>{value.minPoolz}</td><td>{value.numOfWinners}</td></tr>))}
-          </tbody>
-        </table>
+        </Button>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Allocation %</TableCell>
+              <TableCell>Minimum POOLZ</TableCell>
+              <TableCell>Number Of Winners</TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {this.state.tiers.map(value => (
+              <TableRow><TableCell>{value.name}</TableCell>
+                <TableCell>{value.allocation}</TableCell>
+                <TableCell>{value.minPoolz}</TableCell>
+                <TableCell>{value.numOfWinners}</TableCell>
+                <TableCell>
+                  <Button variant="contained" onClick={() => {
+                    let index = this.state.tiers.findIndex(T => T.id == value.id);
+                    this.state.tiers.splice(index, 1);//deletes element
+                    this.setState({ tiers:  this.state.tiers});// refreshes state
+                  }
+                  }>
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>))}
+          </TableBody>
+        </Table>
         <br />
+        {/*<ProgressBar animated striped variant="success" now={progress} label={`${progress}%`} />)*/}
         <CSVLink
           data={this.state.csvdata}
           filename={'output.csv'}
