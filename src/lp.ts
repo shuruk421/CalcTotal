@@ -31,6 +31,7 @@ export async function GetBalanceOf(abi: any, contractAddr: any, addr: any) {
 export async function SumLPAddress(balances: any, contractAddress: any, addresses: any) {
     let promises: any = [];
     addresses.forEach((addr: any) => {
+        addr = addr.toLowerCase();
         if (balances[addr] == null)
             balances[addr] = 0;
         promises.push(GetBalanceOf(lpContractABI, contractAddress, addr).then(bal => {

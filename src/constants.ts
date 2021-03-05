@@ -1,6 +1,6 @@
 export const providerAddress = 'wss://mainnet.infura.io/ws/v3/3130773e4aab4a9298ca23128daebb22';//'ws://localhost:8545';//"wss://mainnet.infura.io/ws/v3/3130773e4aab4a9298ca23128daebb22";//"wss://mainnet.infura.io/ws/v3/4cc15a80f768408e8751887805e49a0a";
 export const tokenAddress = '0x69A95185ee2a045CDC4bCd1b1Df10710395e4e23';
-export const lockedSupplyAddresses = ['0xbdcd10094fea50a42997aeb5c8b715f34c5c7fe2', '0x30b26Fa229c66E3De19A4D038d6AF19b2e2EFE72', '0x164D3891415B66c4002A9366F2Fa75bb5723c989'];
+export const lockedSupplyAddresses = ['0xbdcd10094fea50a42997aeb5c8b715f34c5c7fe2', '0x30b26Fa229c66E3De19A4D038d6AF19b2e2EFE72', '0x164D3891415B66c4002A9366F2Fa75bb5723c989', '0x7b734f3f973670093753621CA72e4B02493cD37A'];
 export const lpAddresses = ['0x70a3944215de6fa1463a098ba182634df90bb9f4'];
 export const lpStakingAddresses = [];
 export const tokenStartBlock = 11659901;

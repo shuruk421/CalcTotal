@@ -22,7 +22,7 @@ class App extends Component {
     super(props);
     this.csvLink = React.createRef();
   }
-  
+
   state = {
     getLP: false,
     getStaking: false,
@@ -35,9 +35,12 @@ class App extends Component {
     name: '',
     tiers: [],
     csvdata: '',
-    //progress: 0
+    newStakingAmount: 0,
+    newStakingMin: 0,
+    newStakingMax: 0,
+    newStaking: 0
   };
-  
+
   render() {
     return (
       <div className="App">
@@ -64,17 +67,42 @@ class App extends Component {
         />
         <Button variant="contained" onClick={() => {
           Main.calcTotal(this.state.getLP, this.state.getStaking, this.state.getWallet).then(balances => {
-            Main.RandomizeWinnings(balances, this.state.tiers, this.state.totalWin).then(result => {
-              Main.toCSV(result, this.state.tiers).then(csv => {
-                this.setState({ csvdata: csv });
-                this.csvLink.current.link.click();
+            Main.RandomizeOneUps(balances, +this.state.newStakingAmount, +this.state.newStakingMin, +this.state.newStakingMax, +this.state.newStaking).then(balances => {
+              Main.SortDictionary(balances).then(balances => {
+                Main.RandomizeWinnings(balances, this.state.tiers, this.state.totalWin).then(result => {
+                  Main.toCSV(result, this.state.tiers).then(csv => {
+                    this.setState({ csvdata: csv });
+                    this.csvLink.current.link.click();
+                  });
+                });
               });
-            });
+            })
           })
         }
         }>
           Calculate Total
       </Button>
+        <br />
+        <TextField
+          label="New Staking Amount"
+          value={this.state.newStakingAmount}
+          onChange={(event) => this.setState({ newStakingAmount: event.target.value })}
+        />
+        <TextField
+          label="New Staking Min"
+          value={this.state.newStakingMin}
+          onChange={(event) => this.setState({ newStakingMin: event.target.value })}
+        />
+        <TextField
+          label="New Staking Max"
+          value={this.state.newStakingMax}
+          onChange={(event) => this.setState({ newStakingMax: event.target.value })}
+        />
+        <TextField
+          label="New Staking"
+          value={this.state.newStaking}
+          onChange={(event) => this.setState({ newStaking: event.target.value })}
+        />
         <br />
         <TextField
           id="totalWin"
@@ -145,7 +173,7 @@ class App extends Component {
                   <Button variant="contained" onClick={() => {
                     let index = this.state.tiers.findIndex(T => T.id == value.id);
                     this.state.tiers.splice(index, 1);//deletes element
-                    this.setState({ tiers:  this.state.tiers});// refreshes state
+                    this.setState({ tiers: this.state.tiers });// refreshes state
                   }
                   }>
                     Delete
