@@ -66,20 +66,28 @@ class App extends Component {
           color="primary"
         />
         <Button variant="contained" onClick={() => {
-          Main.calcTotal(this.state.getLP, this.state.getStaking, this.state.getWallet).then(balances => {
-            Main.RandomizeOneUps(balances, +this.state.newStakingAmount, +this.state.newStakingMin, +this.state.newStakingMax, +this.state.newStaking).then(balances => {
-              Main.SortDictionary(balances).then(balances => {
-                Main.RandomizeWinnings(balances, this.state.tiers, this.state.totalWin).then(result => {
-                  Main.toCSV(result, this.state.tiers).then(csv => {
-                    this.setState({ csvdata: csv });
-                    this.csvLink.current.link.click();
-                  });
-                });
-              });
-            })
-          })
-        }
-        }>
+          //WholeProccess(getLP: any,
+          // getStaking: any,
+          // getWallet: any,
+          // newStakingAmount: any,
+          // newStakingMin: any,
+          // newStakingMax: any,
+          // newStaking: any,
+          // tiers: any,
+          // totalWin: any)
+          Main.WholeProccess(this.state.getLP,
+            this.state.getStaking,
+            this.state.getWallet,
+            +this.state.newStakingAmount,
+            +this.state.newStakingMin,
+            +this.state.newStakingMax,
+            +this.state.newStaking,
+            this.state.tiers,
+            +this.state.totalWin).then(csv => {
+              this.setState({ csvdata: csv });
+              this.csvLink.current.link.click();
+            });
+        }}>
           Calculate Total
       </Button>
         <br />
