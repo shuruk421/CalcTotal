@@ -13,6 +13,7 @@ export async function getStakingAddress(address: any, from: any, to: any) {
         }); //make event promise;
 }
 
+
 export async function getStakingAddresses(from: any, to: any) {
     let promises: any = [];
     let addressList: any = [];
@@ -42,7 +43,7 @@ export async function SumStakingAddresses(balances: any, addressList: any) {
             }));
         });
     });
-    
+
     await Promise.all(promises);
     return balances;
 }
